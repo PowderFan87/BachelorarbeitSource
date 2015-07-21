@@ -11,6 +11,8 @@ public class Bootstrap {
     public static void init(Configuration objConfiguration) {
         Main.objLogger.log(Level.INFO, "Start application init via Bootstrap");
         
+        
+        
         Main.objLogger.log(Level.INFO, "End application init via Bootstrap");
     }
 }
