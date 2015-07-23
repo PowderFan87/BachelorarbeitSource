@@ -3,6 +3,7 @@ package com.hszuesz.logfileanalyzer;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.hadoop.util.ToolRunner;
 
 /**
  *
@@ -17,20 +18,18 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
-            Configuration objConf;
-            
-            if (args.length == 1) {
-                objConf = new Configuration(args[0]);
-            } else {
-                objConf = new Configuration();
-            }
+            LFAConfiguration objConf = new LFAConfiguration();
             
             Bootstrap.init(objConf);
             
-            
+            int lngExitCode = ToolRunner.run(new org.apache.hadoop.conf.Configuration(), new Quicktest(), args);
+        
+            System.exit(lngExitCode);
             
         } catch (IOException ex) {
             objLogger.log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
