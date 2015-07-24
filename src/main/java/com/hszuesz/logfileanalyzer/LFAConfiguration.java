@@ -1,9 +1,14 @@
 package com.hszuesz.logfileanalyzer;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -16,8 +21,8 @@ import java.util.logging.LogManager;
 public class LFAConfiguration extends Properties {
 
     public static final String CORE_PROPERTIES  = "/core.properties";
-    public static final String DEFAULT_KEY      = "DEFAULT_PROPERTIES";
-    public static final String LOGGER_KEY       = "LOGGER_PROPERTIES";
+    public static final String DEFAULT_KEY      = "lfa.path.properties.default";
+    public static final String LOGGER_KEY       = "lfa.path.properties.logger";
 
     /**
      * Default constructor. No user conf given. Use default conf.
@@ -28,7 +33,7 @@ public class LFAConfiguration extends Properties {
         super();
 
         this.init();
-//        this.setupRuntime();
+        this.setupRuntime();
     }
 
     /**
@@ -79,44 +84,31 @@ public class LFAConfiguration extends Properties {
      * 
      */
     private void setupRuntime() throws IOException {
-        String strRunmode = this.getProperty("RUNMODE");
+        String strRunmodePrefix = "lfa.runmode." + this.getProperty("lfa.runmode").toLowerCase();
 
-        this.setProperty("LOGTARGET", MessageFormat.format(this.getProperty("LOGTARGET"), this.getProperty(strRunmode + "_LOGTARGET")));
-        this.setProperty("LOGLEVEL", MessageFormat.format(this.getProperty("LOGLEVEL"), this.getProperty(strRunmode + "_LOGLEVEL")));
-        this.setProperty("LOGFORMATTER", MessageFormat.format(this.getProperty("LOGFORMATTER"), this.getProperty(strRunmode + "_LOGFORMATTER")));
-        this.setProperty("FILEACTION", MessageFormat.format(this.getProperty("FILEACTION"), this.getProperty(strRunmode + "_FILEACTION")));
+        this.setProperty("lfa.logger.handlers", MessageFormat.format(this.getProperty("lfa.logger.handlers"), this.getProperty(strRunmodePrefix + ".logger.handlers")));
+        this.setProperty("lfa.logger.level", MessageFormat.format(this.getProperty("lfa.logger.level"), this.getProperty(strRunmodePrefix + ".logger.level")));
+        this.setProperty("lfa.logger.formatter", MessageFormat.format(this.getProperty("lfa.logger.formatter"), this.getProperty(strRunmodePrefix + ".logger.formatter")));
+        this.setProperty("lfa.fileaction", MessageFormat.format(this.getProperty("lfa.fileaction"), this.getProperty(strRunmodePrefix + ".logger.fileaction")));
 
-//        Properties objLoggerProperties = new Properties();
+        Properties objLoggerProperties = new Properties();
         
-        System.setProperty("handlers", this.getProperty("LOGTARGET"));
-        System.setProperty("java.util.logging.ConsoleHandler.level", this.getProperty("LOGLEVEL"));
-        System.setProperty("java.util.logging.FileHandler.level", this.getProperty("LOGLEVEL"));
-        System.setProperty("java.util.logging.ConsoleHandler.formatter", this.getProperty("LOGFORMATTER"));
-        System.setProperty("java.util.logging.FileHandler.formatter", this.getProperty("LOGFORMATTER"));
-        
-        LogManager.getLogManager().readConfiguration();
-        
-        
-//        Properties objLoggerProperties = new Properties();
-//
-//        try (BufferedInputStream objStream = new BufferedInputStream(new FileInputStream(this.getProperty(LOGGER_KEY)))) {
-//            objLoggerProperties.load(objStream);
-//            
-//            objLoggerProperties.setProperty("handlers", this.getProperty("LOGTARGET"));
-//            objLoggerProperties.setProperty("java.util.logging.ConsoleHandler.level", this.getProperty("LOGLEVEL"));
-//            objLoggerProperties.setProperty("java.util.logging.FileHandler.level", this.getProperty("LOGLEVEL"));
-//            objLoggerProperties.setProperty("java.util.logging.ConsoleHandler.formatter", this.getProperty("LOGFORMATTER"));
-//            objLoggerProperties.setProperty("java.util.logging.FileHandler.formatter", this.getProperty("LOGFORMATTER"));
-//            
-//            BufferedOutputStream objSave = new BufferedOutputStream(new FileOutputStream(this.getProperty(LOGGER_KEY)));
-//            
-//            objLoggerProperties.store(objSave, "UPDATED LOGGER PROPERTIES");
-//
-//            System.setProperty("java.util.logging.config.file", this.getProperty(LOGGER_KEY));
-//
-//            LogManager.getLogManager().readConfiguration();
-//        } catch (IOException ex) {
-//            Main.objLogger.log(Level.SEVERE, "Failed to read/write Logger properties", ex);
-//        }
+        objLoggerProperties.load(this.getClass().getResourceAsStream(this.getProperty(LOGGER_KEY)));
+
+        objLoggerProperties.setProperty("handlers", this.getProperty("lfa.logger.handlers"));
+        objLoggerProperties.setProperty("java.util.logging.ConsoleHandler.level", this.getProperty("lfa.logger.level"));
+        objLoggerProperties.setProperty("java.util.logging.FileHandler.level", this.getProperty("lfa.logger.level"));
+        objLoggerProperties.setProperty("java.util.logging.ConsoleHandler.formatter", this.getProperty("lfa.logger.formatter"));
+        objLoggerProperties.setProperty("java.util.logging.FileHandler.formatter", this.getProperty("lfa.logger.formatter"));
+
+        StringWriter objWriter = new StringWriter();
+
+        objLoggerProperties.list(new PrintWriter(objWriter));
+
+        String strLoggerProperties = objWriter.getBuffer().toString();
+
+        InputStream objPropertiesStream = new ByteArrayInputStream(strLoggerProperties.getBytes(StandardCharsets.UTF_8));
+
+        LogManager.getLogManager().readConfiguration(objPropertiesStream);
     }
 }

@@ -19,7 +19,6 @@ import org.apache.hadoop.util.Tool;
  * @param <V>
  */
 public class Driver<K, V> extends Configured implements Tool {
-    private Class<?>                        clsJarByClass;
     private Class<? extends Mapper>         clsMapperClass;
     private Class<? extends Reducer>        clsReducerClass;
     private Class<? extends K>              clsOutputKeyClass;
@@ -36,7 +35,7 @@ public class Driver<K, V> extends Configured implements Tool {
         
         Job objJob = new Job(objConf, this.strJobName);
         
-        objJob.setJarByClass(this.clsJarByClass);
+        objJob.setJarByClass(this.getClass());
         objJob.setMapperClass(this.clsMapperClass);
         objJob.setReducerClass(this.clsReducerClass);
         objJob.setOutputKeyClass(this.clsOutputKeyClass);
@@ -57,10 +56,6 @@ public class Driver<K, V> extends Configured implements Tool {
 
     public void setClsOutputFormatClass(Class<? extends OutputFormat> clsOutputFormatClass) {
         this.clsOutputFormatClass = clsOutputFormatClass;
-    }
-
-    public void setClsJarByClass(Class<?> clsJarByClass) {
-        this.clsJarByClass = clsJarByClass;
     }
 
     public void setClsMapperClass(Class<? extends Mapper> clsMapperClass) {

@@ -3,6 +3,7 @@ package com.hszuesz.logfileanalyzer;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 
 /**
@@ -17,12 +18,25 @@ public class Main {
      * @param args 
      */
     public static void main(String[] args) {
+        if (args.length != 2) {
+            System.out.println("WRONG PARAMETER COUNT!!!");
+            System.out.println("GOOD BYE...");
+            
+            System.exit(1);
+        }
+        
         try {
-            LFAConfiguration objConf = new LFAConfiguration();
+            LFAConfiguration objConf;
             
-            Bootstrap.init(objConf);
+            if (System.getProperty("logfileanalyzer.userconf") != null) {
+                objConf = new LFAConfiguration(System.getProperty("logfileanalyzer.userconf"));
+            } else {
+                objConf = new LFAConfiguration();
+            }
             
-            int lngExitCode = ToolRunner.run(new org.apache.hadoop.conf.Configuration(), new Quicktest(), args);
+            Driver objDriver = Bootstrap.init(objConf);
+            
+            int lngExitCode = ToolRunner.run(new Configuration(), objDriver, args);
         
             System.exit(lngExitCode);
             
