@@ -1,8 +1,8 @@
 package com.hszuesz.logfileanalyzer.recordreader;
 
-import com.hszuesz.logfileanalyzer.Main;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.hadoop.conf.Configuration;
@@ -83,7 +83,7 @@ public class LinePatternRecordReader extends RecordReader<Text, IntWritable> {
             if (objMatcher.find()) {
                 this.objKey.set(objMatcher.group(1));
             } else {
-                Main.objLogger.log(Level.WARNING, "Can''t find matching key for expression /{0}/ at position {1}. Key is set to 'MISC'", new Object[]{this.strKeyPattern, this.lngPosition});
+                Logger.getLogger(LinePatternRecordReader.class.getName()).log(Level.WARNING, "Can''t find matching key for expression /{0}/ at position {1}. Key is set to 'MISC'", new Object[]{this.strKeyPattern, this.lngPosition});
             
                 this.objKey.set("MISC");
             }
@@ -94,7 +94,7 @@ public class LinePatternRecordReader extends RecordReader<Text, IntWritable> {
                 break;
             }
             
-            Main.objLogger.log(Level.WARNING, "Line too long ar position {0}", (this.lngPosition - intNewSize));
+            Logger.getLogger(LinePatternRecordReader.class.getName()).log(Level.WARNING, "Line too long ar position {0}", (this.lngPosition - intNewSize));
         }
         
         if (intNewSize == 0) {

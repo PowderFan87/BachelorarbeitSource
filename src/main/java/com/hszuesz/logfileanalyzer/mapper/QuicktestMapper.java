@@ -1,9 +1,9 @@
 package com.hszuesz.logfileanalyzer.mapper;
 
-import com.hszuesz.logfileanalyzer.Main;
 import com.hszuesz.logfileanalyzer.Quicktest;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.hadoop.conf.Configuration;
@@ -30,7 +30,7 @@ public class QuicktestMapper extends Mapper<Object, Text, Text, IntWritable> {
         if (objMatcher.find()) {
             objErrorType.set(objMatcher.group(1));
         } else {
-            Main.objLogger.log(Level.WARNING, "Can't find matching key. Using MISC");
+            Logger.getLogger(QuicktestMapper.class.getName()).log(Level.WARNING, "Can't find matching key. Using MISC");
             
             objErrorType.set("MISC");
         }

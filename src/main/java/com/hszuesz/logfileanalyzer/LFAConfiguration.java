@@ -13,9 +13,16 @@ import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
+ * Custom Properties class to handle all kind of configurations in propper order
  *
+ * Custom extension of {@link Properties} class to handle the three kind of
+ * properties files that have to be handled for this application. The first one
+ * holds the core properties that can't be overwritten by the user. Secound one
+ * holds the defaults that can be altered by the third one (user properties)
+ * 
  * @author Holger Szuesz <develop@szuesz.de>
  */
 public class LFAConfiguration extends Properties {
@@ -33,13 +40,13 @@ public class LFAConfiguration extends Properties {
         super();
 
         this.init();
-        this.setupRuntime();
+        this.configurateLogger();
     }
 
     /**
      * Constructor overload for passing user conf file.
      *
-     * @param strUserConfFile
+     * @param strUserConfFile Path to user properties file
      * @throws IOException
      */
     public LFAConfiguration(String strUserConfFile) throws IOException {
@@ -50,21 +57,33 @@ public class LFAConfiguration extends Properties {
         try {
             this.load(strUserConfFile);
         } catch (IOException ex) {
-            Main.objLogger.log(Level.SEVERE, "Failed to load user properties. Using default propterties instead.", ex);
+            Logger.getLogger(LFAConfiguration.class.getName()).log(Level.SEVERE, "Failed to load user properties. Using default propterties instead.", ex);
         }
 
-        this.setupRuntime();
+        this.configurateLogger();
     }
 
+    /**
+     * Initialize the configuration
+     * 
+     * First the core properties are laoded into the class. Core properties hold
+     * path to default configuration. The key for the default configuration is
+     * set in a class constant and used to load the defaults.
+     * 
+     * @throws IOException 
+     */
     private void init() throws IOException {
         this.loadInternal(CORE_PROPERTIES);
         this.loadInternal(this.getProperty(DEFAULT_KEY));
     }
 
     /**
-     * Load properties from file by passed filename
+     * Load properties by filename
+     * 
+     * Load properties that are not part of the jar build (external files) by
+     * reading a file stream.
      *
-     * @param strPropertiesFilename
+     * @param strPropertiesFilename name of external file that has to be loaded
      * @throws FileNotFoundException
      * @throws IOException
      */
@@ -74,16 +93,34 @@ public class LFAConfiguration extends Properties {
         }
     }
     
+    /**
+     * Load internal properties by filename
+     * 
+     * Load properties that are part of the jar build and therefor have to be
+     * read as a resource stream rather than a file stream.
+     * 
+     * @param strPropertiesFilename name of resource file that has to be loaded
+     * @throws IOException 
+     */
     private void loadInternal(String strPropertiesFilename) throws IOException {
         this.load(this.getClass().getResourceAsStream(strPropertiesFilename));
     }
 
     /**
-     * Setup runtime before application starts. Setup logger properties from
-     * default/user properties and update LogManager.
+     * Set final logger configuration and reinitialize {@link LogManager}
      * 
+     * The logger properties are set via formatted messages, because the default
+     * properties only have {0} placeholders, so that the values can be set by
+     * core settings for current runmode. If there are logger settings from an
+     * additional user properties file the placeholder is absent and the value
+     * stays as it it. The values are then set in a common {@link Properties} class that
+     * is initialized by the template logger.properties. The properties object
+     * is then converted into a string that can be converted into a
+     * ByteArrayInputStream so that the {@link LogManager} can read it as a new Config.
+     * 
+     * @throws IOException
      */
-    private void setupRuntime() throws IOException {
+    private void configurateLogger() throws IOException {
         String strRunmodePrefix = "lfa.runmode." + this.getProperty("lfa.runmode").toLowerCase();
 
         this.setProperty("lfa.logger.handlers", MessageFormat.format(this.getProperty("lfa.logger.handlers"), this.getProperty(strRunmodePrefix + ".logger.handlers")));

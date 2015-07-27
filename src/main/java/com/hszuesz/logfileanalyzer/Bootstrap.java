@@ -2,15 +2,30 @@ package com.hszuesz.logfileanalyzer;
 
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.hadoop.util.ToolRunner;
 
 /**
+ * {@link Bootstrap} class for creating a new {@link Driver} via init methode
  *
  * @author Holger Szuesz <it12156@lehre.dhbw-stuttgart.de>
  */
 public class Bootstrap {
     
+    /**
+     * Create and configure instance of {@link Driver}
+     * 
+     * Create a new instance of the {@link Driver} class with the configuration
+     * stored in the passed {@link LFAConfiguration} instance. Setting up the
+     * relevant classes to use for the driver when executed by the {@link ToolRunner}
+     * After that all keys are iterated and additional configuration values are
+     * passed to the {@link Driver}.
+     * 
+     * @param objConfiguration Instance of configuration that has to be used to setup dirver
+     * @return configured {@link Driver}
+     */
     public static Driver init(LFAConfiguration objConfiguration) {
-        Main.objLogger.log(Level.INFO, "START: application init via Bootstrap");
+        Logger.getLogger(Bootstrap.class.getName()).log(Level.INFO, "START: application init via Bootstrap");
         
         Driver objDriver;
         
@@ -37,12 +52,12 @@ public class Bootstrap {
             }
             
         } catch (ClassNotFoundException ex) {
-            Main.objLogger.log(Level.SEVERE, null, ex);
+            Logger.getLogger(Bootstrap.class.getName()).log(Level.SEVERE, null, ex);
             
             return null;
         }
         
-        Main.objLogger.log(Level.INFO, "END: application init via Bootstrap");
+        Logger.getLogger(Bootstrap.class.getName()).log(Level.INFO, "END: application init via Bootstrap");
         
         return objDriver;
     }
