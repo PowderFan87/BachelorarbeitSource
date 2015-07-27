@@ -1,5 +1,6 @@
 package com.hszuesz.logfileanalyzer;
 
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -9,7 +10,7 @@ import java.util.logging.Level;
 public class Bootstrap {
     
     public static Driver init(LFAConfiguration objConfiguration) {
-        Main.objLogger.log(Level.INFO, "Start application init via Bootstrap");
+        Main.objLogger.log(Level.INFO, "START: application init via Bootstrap");
         
         Driver objDriver;
         
@@ -27,13 +28,21 @@ public class Bootstrap {
             
             objDriver.setStrJobName(objConfiguration.getProperty("lfa.driver.job.name"));
             
+            Set<String> setKeys = objConfiguration.stringPropertyNames();
+            
+            for (String strKey : setKeys) {
+                if (strKey.contains("lfa.mapper.") || strKey.contains("lfa.reducer.") || strKey.contains("lfa.driver.add.")) {
+                    objDriver.setAdditionalConfiguration(strKey, objConfiguration.getProperty(strKey));
+                }
+            }
+            
         } catch (ClassNotFoundException ex) {
             Main.objLogger.log(Level.SEVERE, null, ex);
             
             return null;
         }
         
-        Main.objLogger.log(Level.INFO, "End application init via Bootstrap");
+        Main.objLogger.log(Level.INFO, "END: application init via Bootstrap");
         
         return objDriver;
     }

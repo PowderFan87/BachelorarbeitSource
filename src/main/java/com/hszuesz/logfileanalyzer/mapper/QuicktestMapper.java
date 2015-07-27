@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -19,12 +20,13 @@ public class QuicktestMapper extends Mapper<Object, Text, Text, IntWritable> {
     
     @Override
     public void map(Object objKey, Text objValue, Context objContext) throws IOException, InterruptedException {
-        Pattern objKeyPattern = Pattern.compile("\\] ([A-Z]{4,5}) ");
+        Configuration   objConf         = objContext.getConfiguration();
+        Pattern         objKeyPattern   = Pattern.compile("\\] ([A-Z]{4,5}) ");
         
         String  strLine = objValue.toString();
         
         Matcher objMatcher  = objKeyPattern.matcher(strLine);
-
+        
         if (objMatcher.find()) {
             objErrorType.set(objMatcher.group(1));
         } else {

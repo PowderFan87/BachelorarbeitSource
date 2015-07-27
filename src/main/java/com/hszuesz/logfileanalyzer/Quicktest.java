@@ -36,7 +36,6 @@ public class Quicktest extends Configured implements Tool{
         objJob.setOutputValueClass(IntWritable.class);
         
         FileInputFormat.addInputPath(objJob, new Path(arrArguments[0]));
-//        objJob.setInputFormatClass(LinePatternInputFormat.class);
         objJob.setInputFormatClass(TextInputFormat.class);
         
         FileOutputFormat.setOutputPath(objJob, new Path(arrArguments[1]));

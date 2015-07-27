@@ -1,5 +1,7 @@
 package com.hszuesz.logfileanalyzer;
 
+import java.util.HashMap;
+import java.util.logging.Level;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -19,6 +21,8 @@ import org.apache.hadoop.util.Tool;
  * @param <V>
  */
 public class Driver<K, V> extends Configured implements Tool {
+    private final HashMap<String, String>   mapAdditionalConfigurations = new HashMap<>();
+    
     private Class<? extends Mapper>         clsMapperClass;
     private Class<? extends Reducer>        clsReducerClass;
     private Class<? extends K>              clsOutputKeyClass;
@@ -32,6 +36,12 @@ public class Driver<K, V> extends Configured implements Tool {
     @Override
     public int run(String[] arrArguments) throws Exception {
         Configuration objConf = this.getConf();
+        
+        if (this.mapAdditionalConfigurations.size() > 0) {
+            for (String strKey : this.mapAdditionalConfigurations.keySet()) {
+                objConf.set(strKey, this.mapAdditionalConfigurations.get(strKey));
+            }
+        }
         
         Job objJob = new Job(objConf, this.strJobName);
         
@@ -82,5 +92,9 @@ public class Driver<K, V> extends Configured implements Tool {
         this.strJobName = strJobName;
     }
     
-    
+    public void setAdditionalConfiguration(String strKey, String strValue) {
+        Main.objLogger.log(Level.INFO, "Setting additional configuration with key {0} and value {1}", new Object[]{strKey, strValue});
+        
+        this.mapAdditionalConfigurations.put(strKey, strValue);
+    }
 }
