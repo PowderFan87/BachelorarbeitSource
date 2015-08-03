@@ -8,15 +8,16 @@ import org.apache.hadoop.mapreduce.Reducer;
 /**
  * Extending {@link Reducer} for individual use.
  *
- * Individual extension to {@link Reducer} for creating a count of some sort.
+ * Individual extension to {@link Reducer} to get the minimum value for a
+ * given key
  *
  * @author Holger Szuesz <it12156@lehre.dhbw-stuttgart.de>
  */
-public class CountReducer extends Reducer<Text, IntWritable, Text, IntWritable>  {
-    private final IntWritable objTotal = new IntWritable();
+public class MinimumReducer extends Reducer<Text, IntWritable, Text, IntWritable>  {
+    private final IntWritable objMinimum = new IntWritable();
 
     /**
-     * Sum up all values for one key and write new sum to corresponding key
+     * Find the minimum value for a given key
      *
      * @param objKey Current key
      * @param arrValues Array of values for the passed key
@@ -26,14 +27,16 @@ public class CountReducer extends Reducer<Text, IntWritable, Text, IntWritable> 
      */
     @Override
     public void reduce(Text objKey, Iterable<IntWritable> arrValues, Context objContext) throws IOException, InterruptedException {
-        int lngSum = 0;
+        int lngMin = Integer.MAX_VALUE;
 
         for(IntWritable objValue : arrValues) {
-            lngSum += objValue.get();
+            if (objValue.get() < lngMin) {
+                lngMin = objValue.get();
+            }
         }
 
-        this.objTotal.set(lngSum);
+        this.objMinimum.set(lngMin);
 
-        objContext.write(objKey, this.objTotal);
+        objContext.write(objKey, this.objMinimum);
     }
 }

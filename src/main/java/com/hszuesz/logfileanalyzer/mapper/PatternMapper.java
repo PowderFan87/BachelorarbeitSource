@@ -37,7 +37,7 @@ public class PatternMapper extends Mapper<Object, Text, Text, IntWritable> {
      * @throws InterruptedException
      */
     @Override
-    public void map(Object objKey, Text objValue, Mapper.Context objContext) throws IOException, InterruptedException {
+    public void map(Object objKey, Text objValue, Context objContext) throws IOException, InterruptedException {
         Configuration   objConf             = objContext.getConfiguration();
         Pattern         objKeyPattern       = Pattern.compile(objConf.get("lfa.mapper.pattern.key"));
         String          strNoMatchAction    = objConf.get("lfa.mapper.nomatchaction");
