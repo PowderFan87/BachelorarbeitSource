@@ -36,9 +36,8 @@ public class Main {
         try {
             LFAConfiguration objConf;
             
-            //TODO: logfileanalyzer auf lfs ändern damit config überall gleich ist (muss auch in sh script geändert werden)
-            if (System.getProperty("logfileanalyzer.userconf") != null) {
-                objConf = new LFAConfiguration(System.getProperty("logfileanalyzer.userconf"));
+            if (System.getProperty("lfa.userconf") != null) {
+                objConf = new LFAConfiguration(System.getProperty("lfa.userconf"));
             } else {
                 objConf = new LFAConfiguration();
             }

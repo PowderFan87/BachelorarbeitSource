@@ -52,7 +52,7 @@ public class PatternMapper extends Mapper<Object, Text, Text, IntWritable> {
             objContext.write(this.objTmpKey, PatternMapper.objOne);
         } else {
             if ("SKIP".equals(strNoMatchAction)) {
-                Logger.getLogger(PatternMapper.class.getName()).log(Level.WARNING, "Can't find matching key for pattern {0}. SKIP", objConf.get("lfa.mapper.pattern.key"));
+                Logger.getLogger(PatternMapper.class.getName()).log(Level.WARNING, "Can''t find matching key for pattern {0}. SKIP", objConf.get("lfa.mapper.pattern.key"));
             } else {
                 Logger.getLogger(PatternMapper.class.getName()).log(Level.WARNING, "Can't find matching key. Using NA");
 
